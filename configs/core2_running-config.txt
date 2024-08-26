@@ -1,0 +1,222 @@
+!
+version 12.2(37)SE1
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname core2
+!
+!
+!
+!
+!
+!
+aaa new-model
+!
+aaa authentication login default group tacacs+ local 
+aaa authentication enable default group tacacs+ local 
+!
+!
+!
+!
+clock timezone MSK 3
+!
+!
+!
+ip routing
+!
+!
+!
+!
+username cisco privilege 15 secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree vlan 100,200,300,400,500 priority 28672
+!
+!
+!
+!
+!
+!
+interface Port-channel1
+ switchport trunk allowed vlan 100,200,300,400,500
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/1
+ switchport trunk allowed vlan 100,200,300,400,500
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/2
+ switchport trunk allowed vlan 100,200,300,400,500
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/3
+ switchport trunk allowed vlan 100,200,300,400,500
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/4
+ switchport trunk allowed vlan 100,200,300,400,500
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/5
+!
+interface FastEthernet0/6
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+ no switchport
+ ip address 172.16.31.6 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/23
+ switchport trunk allowed vlan 100,200,300,400,500
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode passive
+!
+interface FastEthernet0/24
+ switchport trunk allowed vlan 100,200,300,400,500
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 1 mode passive
+!
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan100
+ description MGMT
+ mac-address 0060.474c.6301
+ ip address 172.16.1.3 255.255.255.192
+ standby version 2
+ standby 100 ip 172.16.1.1
+ standby 100 preempt
+!
+interface Vlan200
+ description USER
+ mac-address 0060.474c.6302
+ ip address 172.16.2.3 255.255.255.0
+ ip helper-address 172.16.1.12
+ standby version 2
+ standby 200 ip 172.16.2.1
+ standby 200 preempt
+!
+interface Vlan300
+ description WLAN
+ mac-address 0060.474c.6303
+ ip address 172.16.3.3 255.255.255.0
+ ip helper-address 172.16.1.12
+ ip access-group 10 out
+ standby version 2
+ standby 300 ip 172.16.3.1
+ standby 300 preempt
+!
+interface Vlan400
+ description VoIP
+ mac-address 0060.474c.6304
+ ip address 172.16.4.3 255.255.255.0
+ ip helper-address 172.16.1.12
+ standby version 2
+ standby 400 ip 172.16.4.1
+ standby 400 preempt
+!
+interface Vlan500
+ description PRINTER
+ mac-address 0060.474c.6305
+ ip address 172.16.5.3 255.255.255.0
+ ip helper-address 172.16.1.12
+ standby version 2
+ standby 500 ip 172.16.5.1
+ standby 500 preempt
+!
+router ospf 1
+ router-id 172.16.1.3
+ log-adjacency-changes
+ redistribute connected metric-type 1 subnets 
+ network 172.16.31.4 0.0.0.3 area 1
+ network 172.16.1.0 0.0.0.63 area 1
+!
+ip classless
+!
+ip flow-export version 9
+!
+!
+access-list 10 deny 172.16.1.0 0.0.0.255
+access-list 10 deny 172.16.2.0 0.0.0.255
+access-list 10 deny 172.16.4.0 0.0.0.255
+access-list 10 deny 172.16.5.0 0.0.0.255
+access-list 10 deny 172.16.8.0 0.0.3.255
+access-list 10 permit any
+!
+!
+tacacs-server host 172.16.1.12 key secret1
+!
+!
+!
+!
+logging 172.16.1.12
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login authentication default
+ transport input telnet
+!
+!
+!
+ntp server 172.16.1.12
+ntp update-calendar
+!
+end
+

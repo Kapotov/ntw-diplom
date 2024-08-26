@@ -1,0 +1,132 @@
+!
+version 15.1
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname brdr1
+!
+!
+!
+!
+!
+!
+!
+aaa new-model
+!
+aaa authentication login default group tacacs+ local 
+aaa authentication enable default group tacacs+ local 
+!
+!
+!
+!
+clock timezone MSK 3
+!
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+username cisco privilege 15 secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0
+!
+!
+license udi pid CISCO1941/K9 sn FTX1524EYUD-
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description mgmt
+ ip address 172.16.1.224 255.255.255.255
+!
+interface Tunnel1
+ ip address 172.16.31.21 255.255.255.252
+ mtu 1476
+ tunnel source GigabitEthernet0/0
+ tunnel destination 172.3.0.2
+!
+!
+interface GigabitEthernet0/0
+ ip address 172.1.0.2 255.255.255.252
+ ip nat outside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ description to asa1
+ ip address 172.16.31.9 255.255.255.252
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0/0
+ description to brdr2
+ ip address 172.16.31.17 255.255.255.252
+ ip ospf cost 2000
+ ip ospf priority 100
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 1
+ router-id 172.16.1.224
+ log-adjacency-changes
+ network 172.16.31.16 0.0.0.3 area 0
+ network 172.16.31.20 0.0.0.3 area 2
+ network 172.16.31.8 0.0.0.3 area 1
+ network 172.16.1.224 0.0.0.0 area 1
+!
+router bgp 65200
+ bgp log-neighbor-changes
+ no synchronization
+ neighbor 172.1.0.1 remote-as 65100
+!
+ip nat inside source list 10 interface GigabitEthernet0/0 overload
+ip classless
+ip route 0.0.0.0 0.0.0.0 172.1.0.1 10
+!
+ip flow-export version 9
+!
+!
+access-list 10 permit 172.16.0.0 0.0.0.255
+access-list 10 permit 172.16.2.0 0.0.0.255
+access-list 10 permit 172.16.3.0 0.0.0.255
+!
+!
+tacacs-server host 172.16.1.12 key secret1
+!
+!
+!
+logging 172.16.1.12
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login authentication default
+ transport input telnet
+!
+!
+ntp server 172.16.1.12
+ntp update-calendar
+!
+end
+

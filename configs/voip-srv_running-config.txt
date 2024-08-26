@@ -1,0 +1,158 @@
+!
+version 15.1
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname voip-srv
+!
+!
+!
+!
+!
+!
+!
+aaa new-model
+!
+aaa authentication login default group tacacs+ local 
+aaa authentication enable default group tacacs+ local 
+!
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+username cisco privilege 15 secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0
+!
+!
+license udi pid CISCO2811/K9 sn FTX10174W52-
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ no ip address
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/0.100
+ description mgmt
+ encapsulation dot1Q 100
+ ip address 172.16.1.10 255.255.255.192
+!
+interface FastEthernet0/0.400
+ description voip
+ encapsulation dot1Q 400
+ ip address 172.16.4.10 255.255.255.192
+!
+interface FastEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+ip classless
+ip route 172.16.9.0 255.255.255.0 172.16.4.1 
+!
+ip flow-export version 9
+!
+!
+!
+!
+tacacs-server host 172.16.1.12 key secret1
+!
+!
+!
+logging 172.16.1.12
+telephony-service
+ max-ephones 10
+ max-dn 10
+ ip source-address 172.16.4.10 port 2000
+ auto assign 1 to 10
+!
+ephone-dn 1
+ number 1010
+!
+ephone-dn 2
+ number 1020
+!
+ephone-dn 3
+ number 1030
+!
+ephone-dn 4
+ number 1040
+!
+ephone-dn 5
+ number 1050
+!
+ephone-dn 6
+ number 1060
+!
+ephone-dn 7
+ number 1070
+!
+ephone-dn 8
+ number 1080
+!
+ephone-dn 9
+ number 1090
+!
+ephone-dn 10
+ number 1100
+!
+ephone 1
+ device-security-mode none
+ mac-address 0060.4783.B47C
+ type 7960
+ button 1:1
+!
+ephone 2
+ device-security-mode none
+ mac-address 00E0.F96E.C92D
+ type 7960
+ button 1:2
+!
+ephone 3
+ device-security-mode none
+ mac-address 0050.0FA2.A238
+ type CIPC
+ button 1:3
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login authentication default
+ transport input telnet
+!
+!
+ntp server 172.16.1.12
+ntp update-calendar
+!
+end
+

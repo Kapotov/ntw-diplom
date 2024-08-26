@@ -1,0 +1,162 @@
+!
+version 15.1
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname remote-router
+!
+!
+!
+!
+ip dhcp excluded-address 172.16.8.1 172.16.8.10
+ip dhcp excluded-address 172.16.9.1 172.16.9.10
+ip dhcp excluded-address 172.16.10.1 172.16.10.10
+!
+ip dhcp pool user_pool
+ network 172.16.8.0 255.255.255.0
+ default-router 172.16.8.1
+ip dhcp pool voip_pool
+ network 172.16.9.0 255.255.255.0
+ default-router 172.16.9.1
+ option 150 ip 172.16.4.10
+ip dhcp pool printer_pool
+ network 172.16.10.0 255.255.255.0
+ default-router 172.16.10.1
+!
+!
+aaa new-model
+!
+aaa authentication login default group tacacs+ local 
+aaa authentication enable default group tacacs+ local 
+!
+!
+!
+!
+clock timezone MSK 3
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+username cisco privilege 15 secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0
+!
+!
+license udi pid CISCO1941/K9 sn FTX1524LJ41-
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface Tunnel1
+ ip address 172.16.31.22 255.255.255.252
+ mtu 1476
+ tunnel source GigabitEthernet0/0
+ tunnel destination 172.1.0.2
+!
+!
+interface Tunnel2
+ ip address 172.16.31.26 255.255.255.252
+ mtu 1476
+ tunnel source GigabitEthernet0/0
+ tunnel destination 172.2.0.2
+!
+!
+interface GigabitEthernet0/0
+ ip address 172.3.0.2 255.255.255.252
+ ip access-group 10 out
+ ip nat outside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ no ip address
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1.101
+ description MGMT
+ encapsulation dot1Q 101
+ ip address 172.16.1.65 255.255.255.224
+!
+interface GigabitEthernet0/1.201
+ description USER
+ encapsulation dot1Q 201
+ ip address 172.16.8.1 255.255.255.0
+!
+interface GigabitEthernet0/1.401
+ description VoIP
+ encapsulation dot1Q 401
+ ip address 172.16.9.1 255.255.255.0
+!
+interface GigabitEthernet0/1.501
+ description PRINTER
+ encapsulation dot1Q 501
+ ip address 172.16.10.1 255.255.255.0
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 1
+ router-id 172.16.1.65
+ log-adjacency-changes
+ passive-interface GigabitEthernet0/1.101
+ passive-interface GigabitEthernet0/1.201
+ passive-interface GigabitEthernet0/1.401
+ passive-interface GigabitEthernet0/1.501
+ network 172.16.31.20 0.0.0.3 area 2
+ network 172.16.31.24 0.0.0.3 area 2
+ network 172.16.1.64 0.0.0.31 area 2
+ network 172.16.8.0 0.0.0.255 area 2
+ network 172.16.9.0 0.0.0.255 area 2
+ network 172.16.10.0 0.0.0.255 area 2
+!
+ip classless
+ip route 172.1.0.0 255.255.255.252 172.3.0.1 
+ip route 172.2.0.0 255.255.255.252 172.3.0.1 
+!
+ip flow-export version 9
+!
+!
+access-list 10 permit 172.1.0.0 0.0.0.3
+access-list 10 permit 172.2.0.0 0.0.0.3
+!
+!
+tacacs-server host 172.16.1.12 key secret1
+!
+!
+!
+logging 172.16.1.12
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login authentication default
+ transport input telnet
+!
+!
+ntp server 172.16.1.12
+ntp update-calendar
+!
+end
+

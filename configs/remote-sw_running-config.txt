@@ -1,0 +1,123 @@
+!
+version 15.0
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname remote-sw
+!
+!
+!
+!
+!
+aaa new-model
+!
+aaa authentication login default group tacacs+ local 
+aaa authentication enable default group tacacs+ local 
+!
+!
+!
+!
+clock timezone MSK 3
+!
+!
+username cisco secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+interface FastEthernet0/1
+ switchport access vlan 201
+ switchport mode access
+!
+interface FastEthernet0/2
+ switchport access vlan 501
+ switchport mode access
+!
+interface FastEthernet0/3
+ switchport access vlan 201
+ switchport mode access
+ switchport voice vlan 401
+!
+interface FastEthernet0/4
+ switchport trunk native vlan 101
+ switchport trunk allowed vlan 101,201
+ switchport mode trunk
+!
+interface FastEthernet0/5
+!
+interface FastEthernet0/6
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+!
+interface GigabitEthernet0/1
+ switchport trunk allowed vlan 101,201,401,501
+ switchport mode trunk
+!
+interface GigabitEthernet0/2
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan101
+ description mgmt
+ ip address 172.16.1.66 255.255.255.224
+!
+ip default-gateway 172.16.1.65
+!
+logging 172.16.1.12
+tacacs-server host 172.16.1.12 key secret1
+!
+!
+!
+line con 0
+ login
+!
+line vty 0 4
+ login authentication default
+ transport input telnet
+line vty 5 15
+!
+!
+!
+ntp server 172.16.1.12
+!
+end
+

@@ -1,0 +1,107 @@
+: Saved
+:
+ASA Version 9.6(1)
+!
+hostname asa1
+names
+!
+interface GigabitEthernet1/1
+ description to core1
+ nameif inside
+ security-level 100
+ ip address 172.16.31.1 255.255.255.252
+!
+interface GigabitEthernet1/2
+ nameif outside
+ security-level 0
+ ip address 172.16.31.10 255.255.255.252
+!
+interface GigabitEthernet1/3
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/4
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/5
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/6
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/7
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/8
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface Management1/1
+ management-only
+ nameif mgmt
+ security-level 100
+ ip address 172.16.1.13 255.255.255.192
+!
+object network obj_ALL_LOCAL_NET
+ subnet 172.16.0.0 255.255.224.0
+object network obj_GRE_NET
+ subnet 172.16.31.0 255.255.255.0
+object network obj_MGMT_OFFICE_1
+ subnet 172.16.1.64 255.255.255.224
+object network obj_REMOTE_OFFICE_1
+ subnet 172.16.8.0 255.255.252.0
+!
+!
+access-list acl_IN_FROM_OFFICE_1 extended permit ip object obj_REMOTE_OFFICE_1 object obj_ALL_LOCAL_NET
+access-list acl_IN_FROM_OFFICE_1 extended permit ip object obj_MGMT_OFFICE_1 object obj_ALL_LOCAL_NET
+access-list acl_IN_FROM_OFFICE_1 extended permit ip object obj_GRE_NET object obj_ALL_LOCAL_NET
+!
+!
+access-group acl_IN_FROM_OFFICE_1 in interface outside
+!
+ntp server 172.16.1.12
+!
+class-map inspection_default
+ match default-inspection-traffic
+!
+policy-map type inspect dns preset_dns_map
+ parameters
+  message-length maximum 512
+policy-map global_policy
+ class inspection_default
+  inspect dns preset_dns_map
+  inspect ftp 
+  inspect http 
+  inspect icmp 
+  inspect tftp 
+!
+service-policy global_policy global
+!
+telnet timeout 5
+ssh timeout 5
+!
+!
+!
+!
+router ospf 1
+ router-id 172.16.1.226
+ log-adjacency-changes
+ network 172.16.31.8 255.255.255.252 area 1
+ network 172.16.31.0 255.255.255.252 area 1
+!
